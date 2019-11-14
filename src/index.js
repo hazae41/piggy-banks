@@ -67,7 +67,7 @@ import {
   bold,
   ellipsis
 } from "./styles";
-import * as  serviceWorker from "./serviceWorker";
+import * as serviceWorker from "./serviceWorker";
 import Markdown from "react-markdown";
 
 const Head = () => {
@@ -88,8 +88,6 @@ const notify = async (title, options) => {
 };
 
 const App = () => {
-  Notification.requestPermission();
-
   const web3 = useWeb3();
 
   const network = useNetwork(web3);
@@ -104,6 +102,7 @@ const App = () => {
 
   useEffect(() => {
     if (!account) return;
+    Notification.requestPermission();
     setOnlyOwned(true);
   }, [account]);
 
