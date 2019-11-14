@@ -1,0 +1,15 @@
+{
+  "short_name": "PiggyBanks",
+  "name": "Ethereum Piggy Banks",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#e91e63",
+  "display": "standalone",
+  "theme_color": "#e91e63"
+}

@@ -1,10 +1,4 @@
-# 🐷 Piggy Banks 🐷
-
-Create piggy banks on Ethereum, fill them with tokens and collectibles, and send them!
-
-https://piggybanks.xyz
-
-## What is a Piggy Bank?
+export const help = `## What is a Piggy Bank?
 
 An Ethereum Piggy Bank is like a real piggy bank: it holds money until it is freed.
 
@@ -35,3 +29,4 @@ You can check the current price by clicking the "Create" button.
 ## Can I test it before?
 
 You can test this app on Ropsten Ethereum Network if you use MetaMask or a custom wallet.
+`;
