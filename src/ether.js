@@ -2,10 +2,11 @@ import React, { useMemo, useEffect, useState } from "react";
 import Web3 from "web3";
 import Portis from "@portis/web3";
 import { PiggyBankABI, TokenABI } from "./contracts";
+import { notify } from "./serviceWorker";
 
 export const addresses = {
-  main: "0x08f6e0571bcda646d11371c0dab7d9a72be6bb8e",
-  ropsten: "0x1B723eD1Ea1D145444c4Bab8fbd4f8FF886bFFa3"
+  main: "0x2dc217377ae86268d1f5075fd0a9ad2649617a3c",
+  ropsten: "0xa0270dd8c96ec2cc5f8f9740f6c9cbda7634459b"
 };
 
 export const useWeb3 = () => {
@@ -85,64 +86,128 @@ export const getPiggyBank = async (web3, address) => {
     const balance = await getBalance(address);
     const owner = await contract.methods.owner().call();
     const name = toUtf8(await contract.methods.name().call());
+    const tokens = await getTokens(web3, { address, contract });
+    const collectibles = await getCollectibles(web3, { address, contract });
 
-    return { address, name, owner, balance, contract };
+    return { address, name, owner, balance, contract, tokens, collectibles };
   } catch (err) {
     return {};
   }
 };
 
-export const useBanks = (web3, piggyBanks) => {
+export const useBanks = (web3, account, PiggyBanks) => {
   const [events, setEvents] = useState([]);
   const addEvent = e => setEvents(events => [...events, e]);
 
   useEffect(() => {
-    if (!piggyBanks) return;
-    const event = piggyBanks.events.Created();
+    if (!PiggyBanks) return;
+    const event = PiggyBanks.events.Created();
     event.on("data", addEvent);
     return () => event.off("data", addEvent);
-  }, [piggyBanks]);
+  }, [PiggyBanks]);
 
   const refresh = async () => {
     const o = { fromBlock: 0, toBlock: "latest" };
-    setEvents(await piggyBanks.getPastEvents("Created", o));
+    setEvents(await PiggyBanks.getPastEvents("Created", o));
   };
 
   useEffect(() => {
-    if (!piggyBanks) return;
+    if (!PiggyBanks) return;
     refresh();
-  }, [piggyBanks]);
+  }, [PiggyBanks]);
 
-  const [banks, setBanks] = useState([]);
+  const [eventsToBanks, setEventsToBanks] = useState({});
+
+  const getBank = async e => {
+    const { piggyBank } = e.returnValues;
+    const bank = await getPiggyBank(web3, piggyBank);
+    return bank.contract && bank;
+  };
+
+  const refreshBank = async e => {
+    const bank = await getBank(e);
+    setEventsToBanks(eventsToBanks => {
+      eventsToBanks[e] = bank;
+      return { ...eventsToBanks };
+    });
+  };
+
+  const listenEvents = (e, bank) => {
+    if (!bank) return;
+    const { allEvents, Received } = bank.contract.events;
+    allEvents().on("data", () => refreshBank(e));
+
+    Received().on("data", e => {
+      const { owner } = bank;
+      if (owner !== account) return;
+      const { fromWei } = web3.utils;
+      const { sender, value } = e.returnValues;
+      const ethers = fromWei(value, "ether");
+      const body = `${bank.name} received ${ethers} from ${sender}`;
+      notify("Received some ethers!", { body });
+    });
+  };
 
   const getBanks = async () => {
-    const banks = [];
+    const eventsToBanks = {};
     for await (const e of events) {
-      const { piggyBank } = e.returnValues;
-      const bank = await getPiggyBank(web3, piggyBank);
-      if (!bank.contract) continue;
-      const { allEvents } = bank.contract.events;
-      allEvents().on("data", getBanks);
-      banks.push(bank);
+      const bank = await getBank(e);
+      eventsToBanks[e] = bank;
+      listenEvents(e, bank);
     }
-    setBanks(banks);
+    return eventsToBanks;
   };
 
   useEffect(() => {
-    getBanks();
-  }, [events]);
+    getBanks().then(setEventsToBanks);
+  }, [events, account]);
+
+  const banks = useMemo(() => {
+    return events.map(e => eventsToBanks[e]).filter(it => it);
+  }, [events, eventsToBanks]);
 
   return banks;
 };
 
-export const getToken = async (web3, data, address) => {
+export const getToken = async (web3, bank, address) => {
   try {
     const contract = getContract(web3, TokenABI, address);
     const name = await contract.methods.name().call();
     const symbol = await contract.methods.symbol().call();
-    const balance = await contract.methods.balanceOf(data.address).call();
+    const balance = await contract.methods.balanceOf(bank.address).call();
     return { address, name, symbol, balance, contract };
   } catch (err) {
     return { address };
   }
+};
+
+export const getTokens = async (web3, bank) => {
+  const result = [];
+  const { tokens, tokensCount } = bank.contract.methods;
+  const count = await tokensCount().call();
+  for (let i = 0; i < count; i++) {
+    const address = await tokens(i).call();
+    const token = await getToken(web3, bank, address);
+    result.push(token);
+  }
+  return result;
+};
+
+export const getCollectibles = async (web3, bank) => {
+  const result = [];
+  const { collectibles, collectiblesCount } = bank.contract.methods;
+  const { collected, collectedCount } = bank.contract.methods;
+  const ncollectibles = await collectiblesCount().call();
+  for (let i = 0; i < ncollectibles; i++) {
+    const address = await collectibles(i).call();
+    const token = await getToken(web3, bank, address);
+    const tokens = [];
+    const ncollected = await collectedCount(address).call();
+    for (let j = 0; j < ncollected; j++) {
+      const collectible = await collected(address, j).call();
+      tokens.push(collectible);
+    }
+    result.push({ ...token, tokens });
+  }
+  return result;
 };

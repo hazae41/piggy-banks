@@ -10,6 +10,12 @@
 // To learn more about the benefits of this model and instructions on how to
 // opt-in, read https://bit.ly/CRA-PWA
 
+export const notify = async (title, options) => {
+  if (Notification.permission !== "granted") return;
+  const reg = await navigator.serviceWorker.getRegistration();
+  reg.showNotification(title, { icon: "/icon.png", ...options });
+};
+
 const isLocalhost = Boolean(
   window.location.hostname === "localhost" ||
     // [::1] is the IPv6 localhost address.

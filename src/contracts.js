@@ -14,7 +14,20 @@ export const PiggyBanksABI = [
   },
   {
     anonymous: false,
-    inputs: [],
+    inputs: [
+      {
+        indexed: false,
+        internalType: "address",
+        name: "old",
+        type: "address"
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "owner",
+        type: "address"
+      }
+    ],
     name: "Transferred",
     type: "event"
   },
@@ -130,25 +143,96 @@ export const PiggyBankABI = [
   },
   {
     anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "address",
+        name: "token",
+        type: "address"
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "id",
+        type: "uint256"
+      }
+    ],
+    name: "CollectibleAdded",
+    type: "event"
+  },
+  {
+    anonymous: false,
     inputs: [],
     name: "Freed",
     type: "event"
   },
   {
     anonymous: false,
-    inputs: [],
+    inputs: [
+      {
+        indexed: false,
+        internalType: "address",
+        name: "sender",
+        type: "address"
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "value",
+        type: "uint256"
+      }
+    ],
     name: "Received",
     type: "event"
   },
   {
     anonymous: false,
-    inputs: [],
+    inputs: [
+      {
+        indexed: false,
+        internalType: "bytes32",
+        name: "old",
+        type: "bytes32"
+      },
+      {
+        indexed: false,
+        internalType: "bytes32",
+        name: "name",
+        type: "bytes32"
+      }
+    ],
     name: "Renamed",
     type: "event"
   },
   {
     anonymous: false,
-    inputs: [],
+    inputs: [
+      {
+        indexed: false,
+        internalType: "address",
+        name: "token",
+        type: "address"
+      }
+    ],
+    name: "TokenAdded",
+    type: "event"
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "address",
+        name: "old",
+        type: "address"
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "owner",
+        type: "address"
+      }
+    ],
     name: "Transferred",
     type: "event"
   },

@@ -1,4 +1,33 @@
-export const help = `## What is a Piggy Bank?
+import {
+  Box,
+  CardContent,
+  CardHeader,
+  Dialog,
+  IconButton
+} from "@material-ui/core";
+import { CloseOutlined } from "@material-ui/icons";
+import React from "react";
+import Markdown from "react-markdown";
+import { bold } from "./styles";
+
+export const HelpDialog = ({ navigate }) => {
+  const close = () => navigate("..");
+  return (
+    <Dialog fullWidth disableEnforceFocus scroll="body" open onClose={close}>
+      <CardHeader
+        title="Piggy Banks 🐷"
+        titleTypographyProps={{ style: bold }}
+        action={<IconButton onClick={close} children={<CloseOutlined />} />}
+      />
+      <CardContent>
+        <Box marginTop={-4} />
+        <Markdown source={help} />
+      </CardContent>
+    </Dialog>
+  );
+};
+
+const help = `## What is a Piggy Bank?
 
 An Ethereum Piggy Bank is like a real piggy bank: it holds money until it is freed.
 

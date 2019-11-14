@@ -2,7 +2,6 @@ import { Tooltip, Typography } from "@material-ui/core";
 import { pink } from "@material-ui/core/colors";
 import { createMuiTheme } from "@material-ui/core/styles";
 import React from "react";
-import "./styles.css";
 
 export const bold = { fontWeight: "bold" };
 

@@ -16,12 +16,13 @@ contract Ownable {
         _;
     }
 
-    event Transferred();
+    event Transferred(address old, address owner);
 
     function transfer(address payable _owner) external onlyOwner {
         require(_owner != address(0));
+        address old = owner;
         owner = _owner;
-        emit Transferred();
+        emit Transferred(old, _owner);
     }
 }
 
@@ -33,17 +34,18 @@ contract PiggyBank is Ownable, IERC721Receiver {
         name = _name;
     }
     
-    event Received();
+    event Received(address sender, uint value);
 
     function () external payable{
-        emit Received();
+        emit Received(msg.sender, msg.value);
     }
     
-    event Renamed();
+    event Renamed(bytes32 old, bytes32 name);
     
     function rename(bytes32 _name) external onlyOwner {
+        bytes32 old = name;
         name = _name;
-        emit Renamed();
+        emit Renamed(old, _name);
     }
 
     event Freed();
@@ -55,18 +57,21 @@ contract PiggyBank is Ownable, IERC721Receiver {
         selfdestruct(owner);
     }
     
+    event TokenAdded(address token);
     address[] public tokens;
     
     function tokensCount() external view returns (uint) {
         return tokens.length;
     }
 
-    function addToken(address token) external {
+    function addToken(address token) external onlyOwner {
         tokens.push(token);
+        emit TokenAdded(token);
     }
     
     function onERC20Received(address, uint256) public returns(bytes4){
         tokens.push(msg.sender);
+        emit TokenAdded(msg.sender);
         return this.onERC20Received.selector;
     }
     
@@ -79,6 +84,7 @@ contract PiggyBank is Ownable, IERC721Receiver {
         }
     }
     
+    event CollectibleAdded(address token, uint256 id);
     address[] public collectibles;
     mapping(address => uint256[]) public collected; 
     
@@ -95,6 +101,7 @@ contract PiggyBank is Ownable, IERC721Receiver {
             collectibles.push(msg.sender);
         }
         collected[msg.sender].push(tokenId);
+        emit CollectibleAdded(msg.sender, tokenId);
         return this.onERC721Received.selector;
     }
     
@@ -129,9 +136,9 @@ contract PiggyBanks is Payable {
      
     function create(bytes32 _name) external payable returns (address) {
         require(msg.value >= price);
-        PiggyBank bank = new PiggyBank(msg.sender, _name);
+        address payable piggyBank = address(new PiggyBank(msg.sender, _name));
         owner.transfer(msg.value);
-        emit Created(address(bank));
-        return address(bank);
+        emit Created(piggyBank);
+        return piggyBank;
     }
 }
