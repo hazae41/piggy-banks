@@ -67,7 +67,7 @@ import {
   bold,
   ellipsis
 } from "./styles";
-import * as serviceWorker from "./serviceWorker";
+import * as  serviceWorker from "./serviceWorker";
 import Markdown from "react-markdown";
 
 const Head = () => {
