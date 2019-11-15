@@ -107,14 +107,14 @@ export const useBanks = (app, PiggyBanks) => {
     return () => event.off("data", addEvent);
   }, [PiggyBanks]);
 
-  const refresh = async () => {
+  const getEvents = async () => {
     const o = { fromBlock: 0, toBlock: "latest" };
-    setEvents(await PiggyBanks.getPastEvents("Created", o));
+    return await PiggyBanks.getPastEvents("Created", o);
   };
 
   useEffect(() => {
     if (!PiggyBanks) return;
-    refresh();
+    getEvents().then(setEvents);
   }, [PiggyBanks]);
 
   const [eventsToBanks, setEventsToBanks] = useState({});
@@ -164,7 +164,8 @@ export const useBanks = (app, PiggyBanks) => {
   }, [events, account]);
 
   const banks = useMemo(() => {
-    return events.map(e => eventsToBanks[e]).filter(it => it);
+    const all = events.map(e => eventsToBanks[e]).filter(it => it);
+    return all.filter((it, i) => i === all.indexOf(it));
   }, [events, eventsToBanks]);
 
   return banks;

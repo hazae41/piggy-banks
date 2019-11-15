@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 
 export const useLang = lang => {
   return useMemo(() => langs[lang], [lang]);
