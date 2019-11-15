@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 
 export const useLang = lang => {
-  return useMemo(() => langs[lang], [lang]);
+  return useMemo(() => langs[lang] || langs.en, [lang]);
 };
 
 const langs = {

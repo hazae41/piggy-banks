@@ -77,7 +77,7 @@ export const useLocalStorage = (key, def) => {
   return [value, setValue];
 };
 
-const defLang = navigator.languages[0] || "en";
+const defLang = navigator.languages ? navigator.languages[0] : "en";
 const defSettings = { lang: defLang, gasPrice: 1000000000 };
 
 const App = () => {
@@ -94,9 +94,7 @@ const App = () => {
 
   useEffect(() => {
     if (!account) return;
-    try {
-      Notification.requestPermission();
-    } catch (err) {}
+    Notification.requestPermission();
   }, [account]);
 
   const [search, setSearch] = useState("");
