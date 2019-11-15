@@ -94,7 +94,9 @@ const App = () => {
 
   useEffect(() => {
     if (!account) return;
-    Notification.requestPermission();
+    try {
+      Notification.requestPermission();
+    } catch (err) {}
   }, [account]);
 
   const [search, setSearch] = useState("");
