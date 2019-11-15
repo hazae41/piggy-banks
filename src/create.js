@@ -58,7 +58,7 @@ export const CreateDialog = ({ app, navigate }) => {
         title={lang.create.title}
         titleTypographyProps={{ style: bold }}
         action={<IconButton onClick={close} children={<CloseOutlined />} />}
-        subheader={price && lang.create.price(fromWei(price, "finney"))}
+        subheader={price && lang.create.price(fromWei(price))}
       />
       <DialogContent>
         <Card elevation={0}>
