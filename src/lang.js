@@ -35,7 +35,7 @@ const langs = {
       defname: "My piggy bank 🐷",
       toolong: "This name is too long",
       create: "Create",
-      price: price => `${price} Ξ + gas fees`
+      price: price => `Ξ${price} + gas fees`
     },
     rename: {
       title: old => `Rename "${old}"`,
