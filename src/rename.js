@@ -19,8 +19,8 @@ import { CloseOutlined, EditOutlined } from "@material-ui/icons";
 export const RenameDialog = ({ app, bank, navigate }) => {
   const close = () => navigate("..");
 
-  const { web3, account } = app;
-  const { fromUtf8, toWei } = web3.utils;
+  const { settings, lang, web3, account } = app;
+  const { fromUtf8 } = web3.utils;
   const { name: oldName, owner, contract } = bank;
 
   const [name, setName] = useState(oldName);
@@ -31,12 +31,13 @@ export const RenameDialog = ({ app, bank, navigate }) => {
   const rename = async () => {
     setLoading(true);
     try {
+      const { gasPrice } = settings;
       await contract.methods
         .rename(fromUtf8(name))
-        .send({ from: account, gasPrice: toWei("1", "gwei") });
+        .send({ from: account, gasPrice });
 
-      const body = `"${oldName}" has successfully been renamed to "${name}"`;
-      notify("Renamed!", { body });
+      const body = lang.notif.renamed(name);
+      notify(oldName, { body });
 
       close();
     } catch (err) {}
@@ -46,7 +47,7 @@ export const RenameDialog = ({ app, bank, navigate }) => {
   return account !== owner ? null : (
     <Dialog disableEnforceFocus fullWidth scroll="body" open onClose={close}>
       <CardHeader
-        title={`Rename "${oldName}"`}
+        title={lang.rename.title(oldName)}
         titleTypographyProps={{ style: bold }}
         action={<IconButton onClick={close} children={<CloseOutlined />} />}
       />
@@ -57,7 +58,7 @@ export const RenameDialog = ({ app, bank, navigate }) => {
               <InputBase
                 style={bold}
                 fullWidth
-                placeholder="Name"
+                placeholder={lang.rename.name}
                 value={name}
                 onChange={e => setName(e.target.value)}
               />
@@ -66,7 +67,7 @@ export const RenameDialog = ({ app, bank, navigate }) => {
         </Card>
         {!valid && (
           <Box marginTop={1}>
-            <Typography color="error" children="This name is too long" />
+            <Typography color="error" children={lang.rename.toolong} />
           </Box>
         )}
         <Toolbar disableGutters style={{ justifyContent: "center" }}>
@@ -79,7 +80,7 @@ export const RenameDialog = ({ app, bank, navigate }) => {
               fullWidth
               style={{ ...bold, boxShadow: "none" }}
               variant="contained"
-              children="Rename"
+              children={lang.rename.rename}
               startIcon={<EditOutlined />}
             />
           )}

@@ -20,12 +20,13 @@ import {
   CodeOutlined,
   HelpOutlined,
   LockOpenOutlined,
-  SearchOutlined
+  SearchOutlined,
+  SettingsOutlined
 } from "@material-ui/icons";
 import { useTheme } from "@material-ui/styles";
 import { navigate, Router } from "@reach/router";
 import FuzzySearch from "fuzzy-search";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import ReactDOM from "react-dom";
 import { Helmet } from "react-helmet";
 import { BankDialog } from "./bank";
@@ -49,6 +50,8 @@ import {
   piggyLight,
   Touchtip
 } from "./styles";
+import { useLang } from "./lang";
+import { SettingsDialog } from "./settings";
 
 const Head = () => {
   const { primary } = useTheme().palette;
@@ -61,7 +64,26 @@ const Head = () => {
   );
 };
 
+export const useLocalStorage = (key, def) => {
+  const { parse, stringify } = JSON;
+  const [raw, setRaw] = useState(localStorage[key]);
+  const value = useMemo(() => parse(raw || null) || def, [raw, def]);
+  const setValue = useCallback(it => setRaw(stringify(it)), []);
+
+  useEffect(() => {
+    localStorage[key] = raw || null;
+  }, [raw]);
+
+  return [value, setValue];
+};
+
+const defLang = navigator.languages[0] || "en";
+const defSettings = { lang: defLang, gasPrice: 1000000000 };
+
 const App = () => {
+  const [settings, setSettings] = useLocalStorage("settings", defSettings);
+  const lang = useLang(settings.lang);
+
   const web3 = useWeb3();
 
   const network = useNetwork(web3);
@@ -69,17 +91,19 @@ const App = () => {
 
   const address = useMemo(() => addresses[network], [network]);
   const PiggyBanks = useContract(web3, PiggyBanksABI, address);
-  
-  const banks = useBanks(web3, account, PiggyBanks);
 
   useEffect(() => {
     if (!account) return;
-    Notification.requestPermission();
+    try {
+      Notification.requestPermission();
+    } catch (err) {}
   }, [account]);
 
   const [search, setSearch] = useState("");
 
-  const app = { account, network, web3, PiggyBanks };
+  const app = { settings, lang, account, network, web3, PiggyBanks };
+
+  const banks = useBanks(app, PiggyBanks);
 
   return (
     <ThemeProvider theme={piggyDark}>
@@ -88,6 +112,7 @@ const App = () => {
 
       <ThemeProvider theme={piggyLight}>
         <Router>
+          <SettingsDialog app={app} setSettings={setSettings} path="settings" />
           <HelpDialog path="help" />
           <CreateDialog app={app} path="create" />
           <BankDialog app={app} banks={banks} path=":address/*" />
@@ -97,18 +122,24 @@ const App = () => {
       <AppBar elevation={0} position="fixed" style={{ top: "auto", bottom: 0 }}>
         <Toolbar>
           <Box flex={1} />
-          <Touchtip title="Help">
-            <IconButton
-              onClick={() => navigate("help")}
-              children={<HelpOutlined />}
-            />
-          </Touchtip>
-          <Touchtip title="Source code">
+          <Touchtip title={lang.bottom.source}>
             <IconButton
               component="a"
               target="_blank"
               href="https://github.com/hazae41/piggy-banks/"
               children={<CodeOutlined />}
+            />
+          </Touchtip>
+          <Touchtip title={lang.bottom.help}>
+            <IconButton
+              onClick={() => navigate("help")}
+              children={<HelpOutlined />}
+            />
+          </Touchtip>
+          <Touchtip title={lang.bottom.settings}>
+            <IconButton
+              onClick={() => navigate("settings")}
+              children={<SettingsOutlined />}
             />
           </Touchtip>
         </Toolbar>
@@ -154,7 +185,7 @@ const SearchBar = ({
   search: [search, setSearch],
   connect: [connect, isConnecting]
 }) => {
-  const { account, web3, PiggyBanks } = app;
+  const { lang, account, web3, PiggyBanks } = app;
   const { isAddress } = web3.utils;
   const open = address => isAddress(address) && navigate(address);
 
@@ -164,7 +195,7 @@ const SearchBar = ({
         <InputBase
           fullWidth
           style={bold}
-          placeholder="Search for a piggy bank"
+          placeholder={lang.search.placeholder}
           value={search}
           onChange={e => setSearch(e.target.value)}
           onKeyPress={e => e.key === "Enter" && open(e.target.value)}
@@ -173,7 +204,7 @@ const SearchBar = ({
           }
         />
         {!account && !isConnecting && (
-          <Touchtip title="Connect">
+          <Touchtip title={lang.search.connect}>
             <IconButton
               color="primary"
               onClick={connect}
@@ -186,7 +217,7 @@ const SearchBar = ({
         )}
         {account && (
           <>
-            <Touchtip title="Create">
+            <Touchtip title={lang.search.create}>
               <span>
                 <IconButton
                   disabled={!PiggyBanks}
@@ -204,7 +235,7 @@ const SearchBar = ({
 };
 
 const BanksList = ({ app, search, banks }) => {
-  const { account } = app;
+  const { lang, account } = app;
   const [onlyOwned, setOnlyOwned] = useState(false);
 
   const filtered = useMemo(() => {
@@ -225,11 +256,11 @@ const BanksList = ({ app, search, banks }) => {
       <Toolbar>
         <BoldTypography
           variant="h6"
-          children={(onlyOwned ? "My" : "All") + " piggy banks"}
+          children={onlyOwned ? lang.list.mine : lang.list.all}
         />
         <Box flex={1} />
         {account && (
-          <Touchtip title="Only mine">
+          <Touchtip title={lang.list.onlyMine}>
             <Switch
               color="primary"
               checked={onlyOwned}

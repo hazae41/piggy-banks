@@ -95,7 +95,8 @@ export const getPiggyBank = async (web3, address) => {
   }
 };
 
-export const useBanks = (web3, account, PiggyBanks) => {
+export const useBanks = (app, PiggyBanks) => {
+  const { web3, lang, account } = app;
   const [events, setEvents] = useState([]);
   const addEvent = e => setEvents(events => [...events, e]);
 
@@ -143,8 +144,8 @@ export const useBanks = (web3, account, PiggyBanks) => {
       const { fromWei } = web3.utils;
       const { sender, value } = e.returnValues;
       const ethers = fromWei(value, "ether");
-      const body = `${bank.name} received ${ethers} from ${sender}`;
-      notify("Received some ethers!", { body });
+      const body = lang.notif.received(sender, ethers);
+      notify(bank.name, { body });
     });
   };
 

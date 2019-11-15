@@ -18,8 +18,8 @@ import { CloseOutlined, PeopleOutlined } from "@material-ui/icons";
 export const TransferDialog = ({ app, bank, navigate }) => {
   const close = () => navigate("..");
 
-  const { web3, account } = app;
-  const { isAddress, toWei } = web3.utils;
+  const { settings, lang, web3, account } = app;
+  const { isAddress } = web3.utils;
   const { name, owner, contract } = bank;
 
   const [target, setTarget] = useState("");
@@ -28,12 +28,11 @@ export const TransferDialog = ({ app, bank, navigate }) => {
   const transfer = async () => {
     setLoading(true);
     try {
-      await contract.methods
-        .transfer(target)
-        .send({ from: account, gasPrice: toWei("1", "gwei") });
+      const { gasPrice } = settings;
+      await contract.methods.transfer(target).send({ from: account, gasPrice });
 
-      const body = `"${name}" has successfully been transfered 🐷`;
-      notify("Transfered!", { body });
+      const body = lang.notif.transferred(target);
+      notify(bank.name, { body });
 
       close();
     } catch (err) {}
@@ -43,7 +42,7 @@ export const TransferDialog = ({ app, bank, navigate }) => {
   return account !== owner ? null : (
     <Dialog disableEnforceFocus fullWidth scroll="body" open onClose={close}>
       <CardHeader
-        title={`Transfer "${name}"`}
+        title={lang.transfer.title(name)}
         titleTypographyProps={{ style: bold }}
         action={<IconButton onClick={close} children={<CloseOutlined />} />}
       />
@@ -54,7 +53,7 @@ export const TransferDialog = ({ app, bank, navigate }) => {
               <InputBase
                 style={bold}
                 fullWidth
-                placeholder="New owner"
+                placeholder={lang.transfer.target}
                 value={target}
                 onChange={e => setTarget(e.target.value)}
               />
@@ -71,7 +70,7 @@ export const TransferDialog = ({ app, bank, navigate }) => {
               fullWidth
               style={{ ...bold, boxShadow: "none" }}
               variant="contained"
-              children="Transfer"
+              children={lang.transfer.transfer}
               startIcon={<PeopleOutlined />}
             />
           )}

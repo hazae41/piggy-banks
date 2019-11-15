@@ -18,10 +18,10 @@ import { CloseOutlined, AddOutlined } from "@material-ui/icons";
 
 export const CreateDialog = ({ app, navigate }) => {
   const close = () => navigate("..");
-  const { web3, account, PiggyBanks } = app;
-  const { fromWei, fromUtf8, toWei } = web3.utils;
+  const { settings, lang, web3, account, PiggyBanks } = app;
+  const { fromWei, fromUtf8 } = web3.utils;
 
-  const [name, setName] = useState("My piggy bank 🐷");
+  const [name, setName] = useState(lang.create.defname);
   const valid = useMemo(() => fromUtf8(name).length <= 66, [name]);
 
   const [price, setPrice] = useState();
@@ -39,12 +39,13 @@ export const CreateDialog = ({ app, navigate }) => {
   const create = async () => {
     setLoading(true);
     try {
+      const { gasPrice } = settings;
       await PiggyBanks.methods
         .create(fromUtf8(name))
-        .send({ from: account, value: price, gasPrice: toWei("1", "gwei") });
+        .send({ from: account, value: price, gasPrice });
 
-      const body = `"${name}" has successfully been created`;
-      notify("Created!", { body });
+      const body = lang.notif.created;
+      notify(name, { body });
 
       close();
     } catch (err) {}
@@ -54,10 +55,10 @@ export const CreateDialog = ({ app, navigate }) => {
   return (
     <Dialog disableEnforceFocus fullWidth scroll="body" open onClose={close}>
       <CardHeader
-        title="Create a new piggy bank"
+        title={lang.create.title}
         titleTypographyProps={{ style: bold }}
         action={<IconButton onClick={close} children={<CloseOutlined />} />}
-        subheader={price && fromWei(price, "finney") + "mΞ + gas fees"}
+        subheader={price && lang.create.price(fromWei(price, "finney"))}
       />
       <DialogContent>
         <Card elevation={0}>
@@ -66,7 +67,7 @@ export const CreateDialog = ({ app, navigate }) => {
               <InputBase
                 style={bold}
                 fullWidth
-                placeholder="Name"
+                placeholder={lang.create.name}
                 value={name}
                 onChange={e => setName(e.target.value)}
               />
@@ -75,7 +76,7 @@ export const CreateDialog = ({ app, navigate }) => {
         </Card>
         {!valid && (
           <Box marginTop={1}>
-            <Typography color="error" children="This name is too long" />
+            <Typography color="error" children={lang.create.toolong} />
           </Box>
         )}
         <Toolbar disableGutters style={{ justifyContent: "center" }}>
@@ -88,7 +89,7 @@ export const CreateDialog = ({ app, navigate }) => {
               fullWidth
               style={{ ...bold, boxShadow: "none" }}
               variant="contained"
-              children="Create"
+              children={lang.create.create}
               startIcon={<AddOutlined />}
             />
           )}

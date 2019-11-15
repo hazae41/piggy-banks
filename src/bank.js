@@ -36,7 +36,7 @@ export const BankDialog = ({ app, address, banks, navigate }) => {
   const bank = useMemo(() => {
     if (!banks) return;
     return banks.find(it => it.address === address);
-  }, [banks]);
+  }, [banks, address]);
 
   const { name, contract } = bank || {};
 
@@ -94,8 +94,7 @@ export const BankDialog = ({ app, address, banks, navigate }) => {
 
 const BankToolbar = ({ app, bank, navigate }) => {
   const close = () => navigate("..");
-  const { account, network, web3 } = app;
-  const { toWei } = web3.utils;
+  const { settings, lang, account, network } = app;
   const { address, name, owner, contract } = bank;
 
   const [loading, setLoading] = useState(false);
@@ -116,12 +115,11 @@ const BankToolbar = ({ app, bank, navigate }) => {
   const free = async () => {
     setLoading(true);
     try {
-      await contract.methods
-        .free()
-        .send({ from: account, gasPrice: toWei("1", "gwei") });
+      const { gasPrice } = settings;
+      await contract.methods.free().send({ from: account, gasPrice });
 
-      const body = `"${bank.name}" has successfully been freed 🐷`;
-      notify("Freed!", { body });
+      const body = lang.notif.freed;
+      notify(bank.name, { body });
 
       close();
     } catch (err) {}
@@ -134,32 +132,32 @@ const BankToolbar = ({ app, bank, navigate }) => {
         disableGutters
         style={{ flexWrap: "wrap", justifyContent: "space-evenly" }}
       >
-        <Touchtip title="Copy address">
+        <Touchtip title={lang.bank.copy}>
           <IconButton
             onClick={() => copy(address)}
             children={<FileCopyOutlined />}
           />
         </Touchtip>
         {navigator.share && (
-          <Touchtip title="Share">
+          <Touchtip title={lang.bank.share}>
             <IconButton onClick={share} children={<ShareOutlined />} />
           </Touchtip>
         )}
-        <Touchtip title="View on Etherscan">
+        <Touchtip title={lang.bank.view}>
           <IconButton onClick={view} children={<SearchOutlined />} />
         </Touchtip>
         {owner === account && (
           <>
-            <Touchtip title="Rename">
+            <Touchtip title={lang.bank.rename}>
               <IconButton
                 onClick={() => navigate("rename")}
                 children={<EditOutlined />}
               />
             </Touchtip>
-            <Touchtip title="Free">
+            <Touchtip title={lang.bank.free}>
               <IconButton onClick={free} children={<VpnKeyOutlined />} />
             </Touchtip>
-            <Touchtip title="Transfer">
+            <Touchtip title={lang.bank.transfer}>
               <IconButton
                 onClick={() => navigate("transfer")}
                 children={<PeopleOutlined />}
