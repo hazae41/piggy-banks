@@ -39,13 +39,17 @@ const Tokens = ({ app, bank }) => {
       const { name, symbol } = await getToken(web3, bank, input);
       if (!name) throw new Error(lang.tokens.notToken(network));
 
-      const { gasPrice } = settings;
-      await contract.methods.addToken(input).send({ from: account, gasPrice });
+      try {
+        const { gasPrice } = settings;
+        await contract.methods
+          .addToken(input)
+          .send({ from: account, gasPrice });
 
-      const body = lang.notif.tokenAdded(symbol);
-      notify(bank.name, { body });
+        const body = lang.notif.tokenAdded(symbol);
+        notify(bank.name, { body });
 
-      setInput("");
+        setInput("");
+      } catch ({ message }) {}
       setStatus();
     } catch ({ message }) {
       setStatus(message);
