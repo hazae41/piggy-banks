@@ -105,7 +105,7 @@ const langs = {
       defname: "Ma tirelire 🐷",
       toolong: "Ce nom est trop long",
       create: "Créer",
-      price: price => `${price} Ξ + frais de transaction`
+      price: price => `${price}Ξ + frais de transaction`
     },
     rename: {
       title: old => `Renommer "${old}"`,
