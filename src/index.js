@@ -299,6 +299,7 @@ const Updater = ({ app }) => {
   const { lang } = app;
   const [reg, setReg] = useState();
   const close = () => setReg();
+  console.log(reg);
 
   const update = () => {
     reg.installing.postMessage({ type: "SKIP_WAITING" });
