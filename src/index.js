@@ -311,7 +311,6 @@ const Updater = ({ app }) => {
   }, []);
 
   const [reload, message] = lang.notif.update;
-  const anchor = { vertical: "bottom", horizontal: "left" };
 
   const action = (
     <>
@@ -335,9 +334,9 @@ const Updater = ({ app }) => {
     <Snackbar
       open={Boolean(reg)}
       onClose={close}
-      anchorOrigin={anchor}
-      message={<Typography style={bold} children={message} />}
       action={action}
+      anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+      message={<Typography style={bold} children={message} />}
     />
   );
 };
