@@ -27,7 +27,8 @@ const langs = {
       transferred: owner => `Transferred to ${owner}`,
       tokenAdded: symbol => `Token ${symbol} has been added`,
       freed: `Freed!`,
-      received: (sender, ethers) => `Received ${ethers} ethers from ${sender}`
+      received: (sender, ethers) => `Received ${ethers} ethers from ${sender}`,
+      update: ["Reload", "An update is available"]
     },
     create: {
       title: "Create a new piggy bank",
@@ -97,7 +98,8 @@ const langs = {
       transferred: owner => `Transféré à ${owner}`,
       tokenAdded: symbol => `Le jeton ${symbol} a été ajouté`,
       freed: `Libéré !`,
-      received: (sender, ethers) => `Reçu ${ethers} ethers depuis ${sender}`
+      received: (sender, ethers) => `Reçu ${ethers} ethers depuis ${sender}`,
+      update: ["Recharger", "Une nouvelle version est disponible"]
     },
     create: {
       title: "Créer une nouvelle tirelire",

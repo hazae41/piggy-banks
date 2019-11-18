@@ -13,7 +13,10 @@ import {
   ListItemText,
   Switch,
   ThemeProvider,
-  Toolbar
+  Toolbar,
+  Snackbar,
+  Button,
+  Typography
 } from "@material-ui/core";
 import {
   AddCircle,
@@ -21,7 +24,9 @@ import {
   HelpOutlined,
   LockOpenOutlined,
   SearchOutlined,
-  SettingsOutlined
+  SettingsOutlined,
+  CloseOutlined,
+  RefreshOutlined
 } from "@material-ui/icons";
 import { useTheme } from "@material-ui/styles";
 import { navigate, Router } from "@reach/router";
@@ -109,6 +114,7 @@ const App = () => {
     <ThemeProvider theme={piggyDark}>
       <Head />
       <CssBaseline />
+      <Updater app={app} />
 
       <ThemeProvider theme={piggyLight}>
         <Router>
@@ -289,7 +295,52 @@ const BanksList = ({ app, search, banks }) => {
   );
 };
 
+const Updater = ({ app }) => {
+  const { lang } = app;
+  const [reg, setReg] = useState();
+  const close = () => setReg();
+
+  const update = () => {
+    reg.installing.postMessage({ type: "SKIP_WAITING" });
+    setTimeout(() => window.location.reload(), 1000);
+  };
+
+  useEffect(() => {
+    serviceWorker.register({ onUpdate: setReg });
+    return () => serviceWorker.unregister();
+  }, []);
+
+  const [reload, message] = lang.notif.update;
+  const anchor = { vertical: "bottom", horizontal: "left" };
+
+  const action = (
+    <>
+      <Touchtip title={reload}>
+        <IconButton
+          color="primary"
+          onClick={update}
+          children={<RefreshOutlined />}
+        />
+      </Touchtip>
+      <Box width={8} />
+      <IconButton
+        color="primary"
+        onClick={close}
+        children={<CloseOutlined />}
+      />
+    </>
+  );
+
+  return (
+    <Snackbar
+      open={Boolean(reg)}
+      onClose={close}
+      anchorOrigin={anchor}
+      message={<Typography style={bold} children={message} />}
+      action={action}
+    />
+  );
+};
+
 const rootElement = document.getElementById("root");
 ReactDOM.render(<App />, rootElement);
-
-serviceWorker.register();
