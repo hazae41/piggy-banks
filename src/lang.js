@@ -146,7 +146,7 @@ const langs = {
     },
     settings: {
       title: "Paramètres",
-      lang: "Langage",
+      lang: "Langue",
       gasPrice: "Prix du gaz"
     }
   }
