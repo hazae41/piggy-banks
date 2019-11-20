@@ -52,7 +52,7 @@ const langs = {
     tokens: {
       title: "Tokens",
       address: "Token address",
-      add: "Add this token",
+      add: "Add a token",
       ethers: network => `Ethers on the ${network} network`,
       notConnected: "You must be connected to add a token",
       notToken: network =>
@@ -130,7 +130,7 @@ const langs = {
     tokens: {
       title: "Jetons",
       address: "Adresse du jeton",
-      add: "Ajouter ce jeton",
+      add: "Ajouter un jeton",
       ethers: network =>
         `Ethers sur le réseau ${network === "main" ? "principal" : network}`,
       notConnected: "Vous devez être connecté pour ajouter un jeton",

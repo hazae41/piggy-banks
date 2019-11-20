@@ -10,7 +10,9 @@ import {
   Typography,
   InputBase,
   IconButton,
-  CircularProgress
+  CircularProgress,
+  TextField,
+  InputAdornment
 } from "@material-ui/core";
 import { BoldTypography, ellipsis, bold, Touchtip } from "./styles";
 import { AddOutlined } from "@material-ui/icons";
@@ -68,6 +70,32 @@ const Tokens = ({ app, bank }) => {
       <Toolbar disableGutters>
         <BoldTypography variant="h6" children={lang.tokens.title} />
       </Toolbar>
+      <TextField
+        fullWidth
+        label={lang.tokens.add}
+        placeholder={lang.tokens.address}
+        variant="outlined"
+        value={input}
+        onChange={e => setInput(e.target.value)}
+        onKeyPress={e => e.key === "Enter" && addToken()}
+        InputProps={{
+          endAdornment: (
+            <InputAdornment position="end">
+              <Touchtip title={lang.tokens.add}>
+                <span>
+                  <IconButton
+                    disabled={!valid}
+                    onClick={addToken}
+                    children={<AddOutlined />}
+                  />
+                </span>
+              </Touchtip>
+            </InputAdornment>
+          )
+        }}
+      />
+
+      <Box height={8} />
       {[ether, ...tokens].map(({ address, name, symbol, balance }) => (
         <Card key={address} elevation={0} style={{ marginBottom: 8 }}>
           <Box bgcolor="secondary.main">
@@ -82,29 +110,7 @@ const Tokens = ({ app, bank }) => {
           </Box>
         </Card>
       ))}
-      <Card elevation={0}>
-        <Box bgcolor="secondary.main">
-          <Toolbar>
-            <InputBase
-              style={bold}
-              fullWidth
-              placeholder={lang.tokens.address}
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyPress={e => e.key === "Enter" && addToken()}
-            />
-            <Touchtip title={lang.tokens.add}>
-              <span>
-                <IconButton
-                  disabled={!valid}
-                  onClick={addToken}
-                  children={<AddOutlined />}
-                />
-              </span>
-            </Touchtip>
-          </Toolbar>
-        </Box>
-      </Card>
+
       {status && (
         <Toolbar style={{ justifyContent: "center" }}>
           {status !== "loading" && (
