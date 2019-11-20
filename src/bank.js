@@ -106,7 +106,7 @@ export const BankDialog = ({ app, address, banks, navigate }) => {
 const Logs = ({ app, bank }) => {
   const { lang, web3 } = app;
   const { fromWei } = web3.utils;
-  const { logs, created, contract } = bank;
+  const { logs, created } = bank;
 
   return (
     <>

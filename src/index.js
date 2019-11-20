@@ -130,7 +130,7 @@ const App = () => {
         display="flex"
         flexDirection="column"
         justifyContent="center"
-        minHeight="90vh"
+        minHeight="80vh"
       >
         <CardContent>
           <Box display="flex" justifyContent="center" alignItems="center">
