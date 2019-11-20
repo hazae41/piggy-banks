@@ -5,8 +5,8 @@ import { PiggyBankABI, TokenABI } from "./contracts";
 import { notify } from "./serviceWorker";
 
 export const addresses = {
-  main: "0x2dc217377ae86268d1f5075fd0a9ad2649617a3c",
-  ropsten: "0xa0270dd8c96ec2cc5f8f9740f6c9cbda7634459b"
+  main: "0xae04305f268db885c89a25b6b4692a4253cabd5b",
+  ropsten: "0xbc0cad0165ad68631244ed08a5ed3e28c72a35e4"
 };
 
 export const useWeb3 = () => {
@@ -130,7 +130,7 @@ export const useBanks = (app, PiggyBanks) => {
   const getBank = async e => {
     const { piggyBank } = e.returnValues;
     const bank = await getPiggyBank(web3, piggyBank);
-    return bank.contract && bank;
+    return bank.contract && { ...bank, created: e };
   };
 
   const refreshBank = async e => {

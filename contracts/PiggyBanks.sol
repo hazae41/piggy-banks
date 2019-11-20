@@ -1,4 +1,4 @@
-pragma solidity ^0.5.12;
+pragma solidity ^0.5.13;
 
 import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/IERC20.sol";
 import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC721/IERC721.sol";
@@ -132,13 +132,13 @@ contract Payable is Ownable(msg.sender) {
 
 contract PiggyBanks is Payable {
     
-    event Created(address piggyBank);
+    event Created(address piggyBank, address creator);
      
     function create(bytes32 _name) external payable returns (address) {
         require(msg.value >= price);
         address payable piggyBank = address(new PiggyBank(msg.sender, _name));
         owner.transfer(msg.value);
-        emit Created(piggyBank);
+        emit Created(piggyBank, msg.sender);
         return piggyBank;
     }
 }

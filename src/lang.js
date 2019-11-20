@@ -47,7 +47,7 @@ const langs = {
     transfer: {
       title: name => `Transfer "${name}"`,
       target: "New owner",
-      tranfer: "Transfer"
+      transfer: "Transfer"
     },
     tokens: {
       title: "Tokens",
@@ -70,6 +70,12 @@ const langs = {
       rename: "Rename",
       free: "Free",
       transfer: "Transfer"
+    },
+    logs: {
+      title: "Logs",
+      created: "Was created by:",
+      received: "Received ethers from:",
+      transferred: "Has been transferred to:"
     },
     settings: {
       title: "Settings",
@@ -119,7 +125,7 @@ const langs = {
     transfer: {
       title: name => `Transférer "${name}"`,
       target: "Nouveau propriétaire",
-      tranfer: "Transférer"
+      transfer: "Transférer"
     },
     tokens: {
       title: "Jetons",
@@ -145,6 +151,12 @@ const langs = {
       rename: "Renommer",
       free: "Libérer",
       transfer: "Transférer"
+    },
+    logs: {
+      title: "Historique",
+      created: "A été créée par:",
+      received: "A reçu des ethers de:",
+      transferred: "A été transféré à:"
     },
     settings: {
       title: "Paramètres",

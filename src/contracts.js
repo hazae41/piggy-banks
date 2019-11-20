@@ -7,6 +7,12 @@ export const PiggyBanksABI = [
         internalType: "address",
         name: "piggyBank",
         type: "address"
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "creator",
+        type: "address"
       }
     ],
     name: "Created",

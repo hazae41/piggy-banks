@@ -10,7 +10,12 @@ import {
   Divider,
   Toolbar,
   CircularProgress,
-  CardContent
+  CardContent,
+  Chip,
+  Typography,
+  ListItem,
+  Card,
+  ListItemText
 } from "@material-ui/core";
 import { Helmet } from "react-helmet";
 import { TransferDialog } from "./transfer";
@@ -22,12 +27,13 @@ import {
   SearchOutlined,
   EditOutlined,
   VpnKeyOutlined,
-  PeopleOutlined
+  PeopleOutlined,
+  DoneOutlined
 } from "@material-ui/icons";
 import { bold, ellipsis, Touchtip } from "./styles";
 import QRCode from "qrcode.react";
 import { TokensAndCollectibles } from "./tokens";
-import copy from "clipboard-copy";
+import clipboard from "clipboard-copy";
 import { Router } from "@reach/router";
 
 export const BankDialog = ({ app, address, banks, navigate }) => {
@@ -69,6 +75,10 @@ export const BankDialog = ({ app, address, banks, navigate }) => {
         subheaderTypographyProps={{ style: ellipsis }}
         action={<IconButton onClick={close} children={<CloseOutlined />} />}
       />
+
+      <BankInfobar app={app} bank={bank} />
+      <Box height={16} />
+
       <DialogContent>
         <Box display="flex" justifyContent="center">
           <QRCode
@@ -82,22 +92,94 @@ export const BankDialog = ({ app, address, banks, navigate }) => {
             }}
           />
         </Box>
-        <Box height={16} />
+        <Logs app={app} bank={bank} />
         <TokensAndCollectibles app={app} bank={bank} />
         <Box height={16} />
       </DialogContent>
+
       <Divider />
       <BankToolbar app={app} bank={bank} navigate={navigate} />
     </Dialog>
   );
 };
 
-const BankToolbar = ({ app, bank, navigate }) => {
-  const close = () => navigate("..");
-  const { settings, lang, account, network } = app;
-  const { address, name, owner, contract } = bank;
+const Logs = ({ app, bank }) => {
+  const { lang, web3 } = app;
+  const { fromWei } = web3.utils;
+  const { created, contract } = bank;
 
-  const [loading, setLoading] = useState(false);
+  const [logs, setLogs] = useState([]);
+
+  const getLogs = async () => {
+    const o = { fromBlock: 0, toBlock: "latest" };
+    return await contract.getPastEvents("allEvents", o);
+  };
+
+  useEffect(() => {
+    getLogs().then(setLogs);
+  }, [bank]);
+
+  return (
+    <>
+      <Toolbar disableGutters>
+        <Typography style={bold} variant="h6" children={lang.logs.title} />
+      </Toolbar>
+      {[created, ...logs].reverse().map(({ event, address, returnValues }) => (
+        <Card key={address} elevation={0} style={{ marginBottom: 8 }}>
+          <Box bgcolor="secondary.main">
+            <ListItem style={{ flexWrap: "wrap" }}>
+              {event === "Created" && (
+                <>
+                  <ListItemText
+                    primary={lang.logs.created}
+                    secondary={returnValues.creator}
+                    secondaryTypographyProps={{ style: ellipsis }}
+                  />
+                </>
+              )}
+              {event === "Received" && (
+                <>
+                  <ListItemText
+                    primary={lang.logs.received}
+                    secondary={returnValues.sender}
+                    secondaryTypographyProps={{ style: ellipsis }}
+                  />
+                  <Typography children={fromWei(returnValues.value, "ether")} />
+                </>
+              )}
+              {event === "Transferred" && (
+                <>
+                  <ListItemText
+                    primary={lang.logs.transferred}
+                    secondary={returnValues.owner}
+                    secondaryTypographyProps={{ style: ellipsis }}
+                  />
+                </>
+              )}
+            </ListItem>
+          </Box>
+        </Card>
+      ))}
+    </>
+  );
+};
+
+const BankInfobar = ({ app, bank }) => {
+  const { lang, network } = app;
+  const { address, name } = bank;
+
+  const [copied, setCopied] = useState(false);
+
+  const copy = () => {
+    clipboard(address);
+    setCopied(true);
+  };
+
+  useEffect(() => {
+    if (!copied) return;
+    const t = setTimeout(() => setCopied(false), 1000);
+    return () => clearTimeout(t);
+  }, [copied]);
 
   const view = () => {
     const prefix = network !== "main" ? network + "." : "";
@@ -108,13 +190,55 @@ const BankToolbar = ({ app, bank, navigate }) => {
     );
   };
 
-  const share = () => {
-    navigator.share({
-      title: name,
-      text: `"${name}" - ${address}`,
-      url: window.location.href
-    });
-  };
+  // const share = () => {
+  //   navigator.share({
+  //     title: name,
+  //     text: `"${name}" - ${address}`,
+  //     url: window.location.href
+  //   });
+  // };
+
+  return (
+    <Toolbar
+      style={{
+        justifyContent: "center",
+        flexWrap: "wrap",
+        minHeight: "inherit"
+      }}
+    >
+      <Chip
+        clickable
+        style={{ ...bold, margin: 4 }}
+        label={lang.bank.copy}
+        icon={copied ? <DoneOutlined /> : <FileCopyOutlined />}
+        onClick={() => copy(address)}
+      />
+      <Chip
+        clickable
+        style={{ ...bold, margin: 4 }}
+        label={lang.bank.view}
+        icon={<SearchOutlined />}
+        onClick={view}
+      />
+      {/* {navigator.share && (
+        <Chip
+          clickable
+          style={{ ...bold, margin: 4 }}
+          label={lang.bank.share}
+          icon={<ShareOutlined />}
+          onClick={share}
+        />
+      )} */}
+    </Toolbar>
+  );
+};
+
+const BankToolbar = ({ app, bank, navigate }) => {
+  const close = () => navigate("..");
+  const { settings, lang, account } = app;
+  const { owner, contract } = bank;
+
+  const [loading, setLoading] = useState(false);
 
   const free = async () => {
     setLoading(true);
@@ -130,45 +254,24 @@ const BankToolbar = ({ app, bank, navigate }) => {
     setLoading(false);
   };
 
-  return (
+  return owner !== account ? null : (
     <>
-      <Toolbar
-        disableGutters
-        style={{ flexWrap: "wrap", justifyContent: "space-evenly" }}
-      >
-        <Touchtip title={lang.bank.copy}>
+      <Toolbar disableGutters style={{ justifyContent: "space-evenly" }}>
+        <Touchtip title={lang.bank.rename}>
           <IconButton
-            onClick={() => copy(address)}
-            children={<FileCopyOutlined />}
+            onClick={() => navigate("rename")}
+            children={<EditOutlined />}
           />
         </Touchtip>
-        {navigator.share && (
-          <Touchtip title={lang.bank.share}>
-            <IconButton onClick={share} children={<ShareOutlined />} />
-          </Touchtip>
-        )}
-        <Touchtip title={lang.bank.view}>
-          <IconButton onClick={view} children={<SearchOutlined />} />
+        <Touchtip title={lang.bank.free}>
+          <IconButton onClick={free} children={<VpnKeyOutlined />} />
         </Touchtip>
-        {owner === account && (
-          <>
-            <Touchtip title={lang.bank.rename}>
-              <IconButton
-                onClick={() => navigate("rename")}
-                children={<EditOutlined />}
-              />
-            </Touchtip>
-            <Touchtip title={lang.bank.free}>
-              <IconButton onClick={free} children={<VpnKeyOutlined />} />
-            </Touchtip>
-            <Touchtip title={lang.bank.transfer}>
-              <IconButton
-                onClick={() => navigate("transfer")}
-                children={<PeopleOutlined />}
-              />
-            </Touchtip>
-          </>
-        )}
+        <Touchtip title={lang.bank.transfer}>
+          <IconButton
+            onClick={() => navigate("transfer")}
+            children={<PeopleOutlined />}
+          />
+        </Touchtip>
       </Toolbar>
       {loading && (
         <Toolbar style={{ justifyContent: "center" }}>
