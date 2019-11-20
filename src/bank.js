@@ -106,18 +106,7 @@ export const BankDialog = ({ app, address, banks, navigate }) => {
 const Logs = ({ app, bank }) => {
   const { lang, web3 } = app;
   const { fromWei } = web3.utils;
-  const { created, contract } = bank;
-
-  const [logs, setLogs] = useState([]);
-
-  const getLogs = async () => {
-    const o = { fromBlock: 0, toBlock: "latest" };
-    return await contract.getPastEvents("allEvents", o);
-  };
-
-  useEffect(() => {
-    getLogs().then(setLogs);
-  }, [bank]);
+  const { logs, created, contract } = bank;
 
   return (
     <>

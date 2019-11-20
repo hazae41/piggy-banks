@@ -88,8 +88,19 @@ export const getPiggyBank = async (web3, address) => {
     const name = toUtf8(await contract.methods.name().call());
     const tokens = await getTokens(web3, { address, contract });
     const collectibles = await getCollectibles(web3, { address, contract });
+    const o = { fromBlock: 0, toBlock: "latest" };
+    const logs = await contract.getPastEvents("allEvents", o);
 
-    return { address, name, owner, balance, contract, tokens, collectibles };
+    return {
+      address,
+      name,
+      owner,
+      balance,
+      contract,
+      tokens,
+      collectibles,
+      logs
+    };
   } catch (err) {
     return {};
   }
