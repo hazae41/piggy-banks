@@ -17,6 +17,7 @@ const langs = {
       mine: "My piggy banks"
     },
     bottom: {
+      offline: "You are offline",
       settings: "Settings",
       help: "Help",
       source: "Source code"
@@ -88,6 +89,7 @@ const langs = {
       mine: "Mes tirelires"
     },
     bottom: {
+      offline: "Vous êtes hors-ligne",
       settings: "Paramètres",
       help: "Aide",
       source: "Code source"

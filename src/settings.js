@@ -15,6 +15,15 @@ import {
 } from "@material-ui/core";
 import { bold } from "./styles";
 import { CloseOutlined } from "@material-ui/icons";
+import { useLocalStorage } from ".";
+
+const defLang = navigator.languages ? navigator.languages[0] : "en";
+const defSettings = { lang: defLang, gasPrice: 1000000000 };
+
+export const useSettings = () => {
+  const [settings, setSettings] = useLocalStorage("settings", defSettings);
+  return [settings, setSettings];
+};
 
 export const SettingsDialog = ({ app, setSettings, navigate }) => {
   const close = () => navigate("..");

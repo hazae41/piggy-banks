@@ -16,7 +16,9 @@ import {
   Toolbar,
   Snackbar,
   Button,
-  Typography
+  Typography,
+  SnackbarContent,
+  Slide
 } from "@material-ui/core";
 import {
   AddCircle,
@@ -26,7 +28,8 @@ import {
   SearchOutlined,
   SettingsOutlined,
   CloseOutlined,
-  RefreshOutlined
+  RefreshOutlined,
+  Warning
 } from "@material-ui/icons";
 import { useTheme } from "@material-ui/styles";
 import { navigate, Router } from "@reach/router";
@@ -56,7 +59,7 @@ import {
   Touchtip
 } from "./styles";
 import { useLang } from "./lang";
-import { SettingsDialog } from "./settings";
+import { SettingsDialog, useSettings } from "./settings";
 
 const Head = () => {
   const { primary } = useTheme().palette;
@@ -82,11 +85,8 @@ export const useLocalStorage = (key, def) => {
   return [value, setValue];
 };
 
-const defLang = navigator.languages ? navigator.languages[0] : "en";
-const defSettings = { lang: defLang, gasPrice: 1000000000 };
-
 const App = () => {
-  const [settings, setSettings] = useLocalStorage("settings", defSettings);
+  const [settings, setSettings] = useSettings();
   const lang = useLang(settings.lang);
 
   const web3 = useWeb3();
@@ -115,6 +115,7 @@ const App = () => {
       <Head />
       <CssBaseline />
       <Updater app={app} />
+      <Bottom app={app} />
 
       <ThemeProvider theme={piggyLight}>
         <Router>
@@ -124,32 +125,6 @@ const App = () => {
           <BankDialog app={app} banks={banks} path=":address/*" />
         </Router>
       </ThemeProvider>
-
-      <AppBar elevation={0} position="fixed" style={{ top: "auto", bottom: 0 }}>
-        <Toolbar>
-          <Box flex={1} />
-          <Touchtip title={lang.bottom.source}>
-            <IconButton
-              component="a"
-              target="_blank"
-              href="https://github.com/hazae41/piggy-banks/"
-              children={<CodeOutlined />}
-            />
-          </Touchtip>
-          <Touchtip title={lang.bottom.help}>
-            <IconButton
-              onClick={() => navigate("help")}
-              children={<HelpOutlined />}
-            />
-          </Touchtip>
-          <Touchtip title={lang.bottom.settings}>
-            <IconButton
-              onClick={() => navigate("settings")}
-              children={<SettingsOutlined />}
-            />
-          </Touchtip>
-        </Toolbar>
-      </AppBar>
 
       <Box
         display="flex"
@@ -338,6 +313,69 @@ const Updater = ({ app }) => {
       anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
       message={<Typography style={bold} children={message} />}
     />
+  );
+};
+
+const Bottom = ({ app }) => {
+  const { lang } = app;
+  const { palette } = useTheme();
+  const [online, setOnline] = useState(navigator.onLine);
+
+  useEffect(() => {
+    window.addEventListener("online", () => setOnline(true));
+    window.addEventListener("offline", () => setOnline(false));
+  }, []);
+
+  return (
+    <>
+      <Slide in={!online} direction="up">
+        <AppBar
+          elevation={0}
+          position="fixed"
+          style={{ top: "auto", bottom: 0, background: palette.error.dark }}
+        >
+          <Box display="flex" justifyContent="center" padding={0.5}>
+            <Warning color="action" />
+            <Box width={8} />
+            <Typography
+              color="textPrimary"
+              style={bold}
+              children={lang.bottom.offline}
+            />
+          </Box>
+        </AppBar>
+      </Slide>
+
+      <AppBar
+        elevation={0}
+        position="fixed"
+        style={{ top: "auto", bottom: online ? 0 : 32 }}
+      >
+        <Toolbar>
+          <Box flex={1} />
+          <Touchtip title={lang.bottom.source}>
+            <IconButton
+              component="a"
+              target="_blank"
+              href="https://github.com/hazae41/piggy-banks/"
+              children={<CodeOutlined />}
+            />
+          </Touchtip>
+          <Touchtip title={lang.bottom.help}>
+            <IconButton
+              onClick={() => navigate("help")}
+              children={<HelpOutlined />}
+            />
+          </Touchtip>
+          <Touchtip title={lang.bottom.settings}>
+            <IconButton
+              onClick={() => navigate("settings")}
+              children={<SettingsOutlined />}
+            />
+          </Touchtip>
+        </Toolbar>
+      </AppBar>
+    </>
   );
 };
 

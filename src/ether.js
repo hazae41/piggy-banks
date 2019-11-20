@@ -112,9 +112,17 @@ export const useBanks = (app, PiggyBanks) => {
     return await PiggyBanks.getPastEvents("Created", o);
   };
 
-  useEffect(() => {
+  const refresh = () => {
     if (!PiggyBanks) return;
     getEvents().then(setEvents);
+  };
+
+  useEffect(() => {
+    window.addEventListener("online", refresh);
+  }, []);
+
+  useEffect(() => {
+    refresh();
   }, [PiggyBanks]);
 
   const [eventsToBanks, setEventsToBanks] = useState({});
