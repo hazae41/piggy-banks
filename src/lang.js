@@ -156,7 +156,7 @@ const langs = {
       title: "Historique",
       created: "A été créée par:",
       received: "A reçu des ethers de:",
-      transferred: "A été transféré à:"
+      transferred: "A été transférée à:"
     },
     settings: {
       title: "Paramètres",
