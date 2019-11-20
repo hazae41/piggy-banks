@@ -101,7 +101,11 @@ const BankToolbar = ({ app, bank, navigate }) => {
 
   const view = () => {
     const prefix = network !== "main" ? network + "." : "";
-    window.open(`https://${prefix}etherscan.io/address/` + address, "_blank");
+    window.open(
+      `https://${prefix}etherscan.io/address/${address}`,
+      "_blank",
+      "noopener"
+    );
   };
 
   const share = () => {

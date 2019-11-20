@@ -62,7 +62,7 @@ const Head = () => {
   const { primary } = useTheme().palette;
   return (
     <Helmet>
-      <title children={"Piggy Banks"} />
+      <title children="Piggy Banks on Ethereum" />
       <body style={`background: ${primary.main};`} />
       <meta name="theme-color" content={primary.main} />
     </Helmet>
