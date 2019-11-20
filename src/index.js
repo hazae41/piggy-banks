@@ -234,22 +234,24 @@ const BanksList = ({ app, search, banks }) => {
 
   return (
     <Card elevation={0}>
-      <Toolbar>
-        <BoldTypography
-          variant="h6"
-          children={onlyOwned ? lang.list.mine : lang.list.all}
-        />
-        <Box flex={1} />
-        {account && (
-          <Touchtip title={lang.list.onlyMine}>
-            <Switch
-              color="primary"
-              checked={onlyOwned}
-              onChange={() => setOnlyOwned(!onlyOwned)}
-            />
-          </Touchtip>
-        )}
-      </Toolbar>
+      <CardActionArea
+        disabled={!account}
+        onClick={() => setOnlyOwned(!onlyOwned)}
+      >
+        <Toolbar>
+          <BoldTypography
+            variant="h6"
+            children={onlyOwned ? lang.list.mine : lang.list.all}
+          />
+          <Box flex={1} />
+          {account && (
+            <Touchtip title={lang.list.onlyMine}>
+              <Switch color="primary" checked={onlyOwned} />
+            </Touchtip>
+          )}
+        </Toolbar>
+      </CardActionArea>
+
       <Divider />
       <Box maxHeight="40vh" style={{ overflowY: "auto" }}>
         {filtered.map(({ address, name }) => (
