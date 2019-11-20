@@ -62,12 +62,11 @@ export const SettingsDialog = ({ app, setSettings, navigate }) => {
             valueLabelDisplay="auto"
             valueLabelFormat={x => fromWei(`${x}`, "gwei").substring(0, 4)}
             min={100000000}
-            max={20000000000}
+            max={10000000000}
             marks={[
               { value: 1000000000, label: "1.00" },
               { value: 5000000000, label: "5.00" },
-              { value: 10000000000, label: "10.0" },
-              { value: 20000000000, label: "20.0" }
+              { value: 10000000000, label: "10.0" }
             ]}
           />
         </Toolbar>
