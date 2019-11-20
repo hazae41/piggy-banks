@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1, shrink-to-fit=no"
     />
-    <meta name="theme-color" content="#000000" />
+    <meta name="theme-color" content="#e91e63" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
     <link rel="shortcut icon" href="%PUBLIC_URL%/icon.png" />
     <link rel="preconnect" href="https://p.typekit.net" />
@@ -16,12 +16,22 @@
       content="Create piggy banks on Ethereum, fill them with tokens and collectibles, and send them!"
     />
     <title>Piggy Banks</title>
+    <style>
+      body {
+        background: #e91e63;
+      }
+    </style>
   </head>
   <body>
     <noscript>
       You need to enable JavaScript to run this app.
     </noscript>
-    <div id="root">Loading...</div>
+    <div id="root">
+      <img
+        src="icon.png"
+        style="height: 5em; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"
+      />
+    </div>
     <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
